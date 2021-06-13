@@ -18,4 +18,5 @@ int main() {
 	std::cin >> z5;
 	std::cout << z5;
 	std::cout << (z1 + z2) << std::endl;
+
 }
