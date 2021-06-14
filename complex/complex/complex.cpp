@@ -1,4 +1,6 @@
 #include "complex.h"
+#include <iomanip>
+#include <iostream>
 
 complex::complex(double a, double b) : re(a), im(b) {}
 
@@ -20,29 +22,49 @@ bool operator==(const complex& lhs, double rhs)
 	return (lhs.re == rhs && lhs.im == 0);
 }
 
-complex& operator+(complex& lhs, const complex& rhs) {
-	lhs.re += rhs.re;
-	lhs.im += rhs.im;
-	return lhs;
+bool equals(complex& lhs, const complex& rhs, const double err)
+{
+	return (abs(err) >= abs(lhs - rhs));
 }
 
-complex& operator-(complex& lhs, const complex& rhs) {
-	lhs.re -= rhs.re;
-	lhs.im -= rhs.im;
-	return lhs;
+bool equals(complex& lhs, double rhs, const double err)
+{
+	return (abs(err) >= abs(lhs - rhs));
 }
 
-complex& operator*(complex& lhs, const complex& rhs) {
-	lhs.re = lhs.re * rhs.re - lhs.im * rhs.im;
-	lhs.im = lhs.re * rhs.im + lhs.im * rhs.re;
-	return lhs;
+std::ostream& operator<<(std::ostream& out, const complex& cpx) {
+	complex ot = cround(cpx, 4);
+	out << "(" << std::setprecision(5) << ot.re << "; " << std::setprecision(5) << ot.im << ")" << std::endl;
+	return out;
 }
 
-complex& operator/(complex& lhs, const complex& rhs) {
+complex operator+(complex& lhs, const complex& rhs) {
+	complex res;
+	res.re = lhs.re + rhs.re;
+	res.im = lhs.im + rhs.im;
+	return res;
+}
+
+complex operator-(complex& lhs, const complex& rhs) {
+	complex res;
+	res.re = lhs.re - rhs.re;
+	res.im = lhs.im - rhs.im;
+	return res;
+}
+
+complex operator*(complex& lhs, const complex& rhs) {
+	complex res;
+	res.re = (lhs.re * rhs.re) - (lhs.im * rhs.im);
+	res.im = (lhs.re * rhs.im) + (lhs.im * rhs.re);
+	return res;
+}
+
+complex operator/(complex& lhs, const complex& rhs) {
 	if (rhs==0) throw std::runtime_error("Division by zero");
-	lhs.re = (rhs.re * lhs.re + rhs.im * lhs.im) / (pow(rhs.re, 2) + pow(rhs.im, 2));
-	lhs.im = (rhs.re * lhs.im - lhs.re * rhs.im) / (pow(rhs.re, 2) + pow(rhs.im, 2));
-	return lhs;
+	complex res;
+	res.re = ((rhs.re * lhs.re) + (rhs.im * lhs.im)) / (pow(rhs.re, 2) + pow(rhs.im, 2));
+	res.im = ((rhs.re * lhs.im) - (lhs.re * rhs.im)) / (pow(rhs.re, 2) + pow(rhs.im, 2));
+	return res;
 }
 
 complex& complex::operator=(const complex& cplx) {
@@ -64,76 +86,75 @@ complex& complex::operator-=(const complex& cplx) {
 }
 
 complex& complex::operator*=(const complex& cplx) {
-	re = re * cplx.re - im * cplx.im;
-	im = re * cplx.im + im * cplx.re;
+	re = (re * cplx.re) - (im * cplx.im);
+	im = (re * cplx.im) + (im * cplx.re);
 	return *this;
 }
 
 complex& complex::operator/=(const complex& cplx) {
 	if (cplx.re == 0 && cplx.im == 0) throw std::runtime_error("Division by zero");
-	re = (cplx.re * re + cplx.im * im) / (pow(cplx.re, 2) + pow(cplx.im, 2));
-	im = (cplx.re * im - re * cplx.im) / (pow(cplx.re, 2) + pow(cplx.im, 2));
+	re = ((cplx.re * re) + (cplx.im * im)) / (pow(cplx.re, 2) + pow(cplx.im, 2));
+	im = ((cplx.re * im) - (re * cplx.im)) / (pow(cplx.re, 2) + pow(cplx.im, 2));
 	return *this;
 }
 
-complex& operator+(complex& lhs, double rhs) {
+complex operator+(complex& lhs, const double rhs) {
+	complex res;
 	complex z(rhs);
-	lhs += z;
-	return lhs;
+	res = lhs + z;
+	return res;
 }
 
-complex& operator-(complex& lhs, double rhs) {
+complex operator-(complex& lhs, const double rhs) {
+	complex res;
 	complex z(rhs);
-	lhs -= z;
-	return lhs;
+	res = lhs - z;
+	return res;
 }
 
-complex& operator*(complex& lhs, double rhs) {
+complex operator*(complex& lhs, const double rhs) {
+	complex res;
 	complex z(rhs);
-	lhs *= z;
-	return lhs;
+	res = lhs * z;
+	return res;
 }
 
-complex& operator/(complex& lhs, double rhs) {
+complex operator/(complex& lhs, const double rhs) {
 	complex z(rhs);
 	if (z==0) throw std::runtime_error("Division by zero");
-	lhs /= z;
-	return lhs;
+	complex res;
+	res = lhs / z;
+	return res;
 }
 
-complex& complex::operator=(double x) {
+complex& complex::operator=(const double x) {
 	re = x;
 	im = 0;
 	return *this;
 }
 
-complex& complex::operator+=(double x) {
+complex& complex::operator+=(const double x) {
 	complex z(x);
 	*this += z;
 	return *this;
 }
 
-complex& complex::operator-=(double x) {
+complex& complex::operator-=(const double x) {
 	complex z(x);
 	*this -= z;
 	return *this;
 }
 
-complex& complex::operator*=(double x) {
+complex& complex::operator*=(const double x) {
 	complex z(x);
 	*this *= z;
 	return *this;
 }
 
-complex& complex::operator/=(double x) {
+complex& complex::operator/=(const double x) {
 	complex z(x);
 	*this /= z;
 	return *this;
-}
-
-std::ostream& operator<<(std::ostream& out, const complex& cpx) {
-	out << "(" << cpx.Re() << "; " << cpx.Im() << ")" << std::endl;
-	return out;
 }
 
 std::istream& operator>>(std::istream& in, complex& cpx) {
@@ -142,8 +163,15 @@ std::istream& operator>>(std::istream& in, complex& cpx) {
 }
 
 complex conj(const complex& cplx) {
-	complex z(cplx.re, (cplx.im * -1));
-	return z;
+	complex res(cplx.re, (cplx.im * -1));
+	return res;
+}
+
+complex polar(const double r, const double phi) {
+	complex res;
+	res.re = r*cos(phi);
+	res.im = r*sin(phi);
+	return res;
 }
 
 double abs(const complex& cplx) {
@@ -154,4 +182,10 @@ double norm(const complex& cplx) {
 	return pow(cplx.re, 2) + pow(cplx.im, 2);
 }
 
+complex cround(complex z, int n)
+{
+	z.re = (round(z.re * pow(10, n))) * pow(10, -n);
+	z.im = (round(z.im * pow(10, n))) * pow(10, -n);
+	return z;
+}
 
